@@ -1,0 +1,26 @@
+version: "2"
+sql:
+  - engine: "postgresql"
+    queries: "queries/feedback.sql"
+    schema: "./../../migrations/postgres"
+    gen:
+      go:
+        out: "gen/feedback"
+        package: "feedback"
+        sql_package: "pgx/v5"
+        emit_interface: true
+        emit_methods_with_db_argument: true
+        omit_unused_structs: true
+
+  - engine: "postgresql"
+    queries: "queries/cats.sql"
+    schema: "./../../migrations/postgres"
+    gen:
+      go:
+        out: "gen/cats"
+        package: "cats"
+        sql_package: "pgx/v5"
+        emit_interface: true
+        emit_methods_with_db_argument: true
+        omit_unused_structs: true
+

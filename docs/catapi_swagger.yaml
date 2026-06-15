@@ -1,0 +1,207 @@
+basePath: /
+definitions:
+  cat_service_internal_data_dto_cats.CatPreview:
+    properties:
+      id:
+        type: integer
+      img_url:
+        type: string
+      name:
+        type: string
+    type: object
+  cat_service_internal_data_dto_cats.CatRequest:
+    properties:
+      age:
+        type: integer
+      homeless:
+        type: boolean
+      img_url:
+        type: string
+      name:
+        type: string
+    type: object
+  cat_service_internal_data_dto_cats.CatResponse:
+    properties:
+      age:
+        type: integer
+      created_at:
+        type: string
+      homeless:
+        type: boolean
+      id:
+        type: integer
+      img_url:
+        type: string
+      name:
+        type: string
+    type: object
+host: localhost:8080
+info:
+  contact: {}
+  description: API for managing cats and feedback
+  title: Cat Service API
+  version: "1.0"
+paths:
+  /:
+    get:
+      description: Get a random cat image from the external API and render it on the
+        homepage
+      produces:
+      - text/html
+      responses:
+        "200":
+          description: HTML page with random cat image
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: Get random cat image
+      tags:
+      - home
+  /api/cats:
+    get:
+      description: Get list of all cats preview with optional limit
+      parameters:
+      - description: Limit the number of cats returned
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/cat_service_internal_data_dto_cats.CatPreview'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: Get cats
+      tags:
+      - cats
+    post:
+      consumes:
+      - application/json
+      description: Create a new cat with the provided information
+      parameters:
+      - description: Cat information
+        in: body
+        name: cat
+        required: true
+        schema:
+          $ref: '#/definitions/cat_service_internal_data_dto_cats.CatRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/cat_service_internal_data_dto_cats.CatResponse'
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: Create a new cat
+      tags:
+      - cats
+  /api/cats/{id}:
+    get:
+      description: Get detailed information about a cat by its ID
+      parameters:
+      - description: Cat ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/cat_service_internal_data_dto_cats.CatResponse'
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: Get cat by ID
+      tags:
+      - cats
+  /api/cats/feedback:
+    get:
+      description: Save feedback for a cat
+      parameters:
+      - description: Quality rating (1-5)
+        in: query
+        name: quality
+        required: true
+        type: integer
+      - description: Cuteness rating (1-5)
+        in: query
+        name: cute
+        required: true
+        type: integer
+      - description: Additional feedback message
+        in: query
+        name: message
+        required: true
+        type: string
+      produces:
+      - text/plain
+      responses:
+        "201":
+          description: Feedback saved successfully
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: Save feedback
+      tags:
+      - feedback
+  /views/cats/internal/{id}:
+    get:
+      description: Get a rendered view of a cat by its ID
+      parameters:
+      - description: Cat ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - text/html
+      responses:
+        "200":
+          description: HTML view of the cat
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: Get cat view by ID
+      tags:
+      - cats
+swagger: "2.0"
