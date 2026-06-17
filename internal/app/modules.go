@@ -14,6 +14,7 @@ import (
 	"time"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/log"
 	"github.com/jackc/pgx/v5/pgxpool"
 	fiberswagger "github.com/swaggo/fiber-swagger"
 	"go.uber.org/fx"
@@ -76,6 +77,7 @@ func ModuleApp() fx.Option {
 		fx.Provide(NewApp),
 		fx.Invoke(
 			func(
+				lc fx.Lifecycle,
 				application *fiber.App,
 				catHandler *handlers.CatHandler,
 				feedbackHandler *handlers.FeedbackHandler,
@@ -86,7 +88,20 @@ func ModuleApp() fx.Option {
 					FeedbackHandler: feedbackHandler,
 					HomeHandler:     homeHandler,
 				})
-				Run(application, 8080)
+
+				lc.Append(fx.Hook{
+					OnStart: func(ctx context.Context) error {
+						go func() {
+							if err := application.Listen(":8080"); err != nil {
+								log.Errorf("Failed to start listening (fiber): %w", err)
+							}
+						}()
+						return nil
+					},
+					OnStop: func(ctx context.Context) error {
+						return application.ShutdownWithContext(ctx)
+					},
+				})
 			}),
 	)
 }
